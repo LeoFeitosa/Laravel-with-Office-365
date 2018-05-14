@@ -44,7 +44,7 @@ class AuthController extends Controller
         if (isset($_GET['code'])) {
             // Check that state matches
             if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth_state'])) {
-            exit('State provided in redirect does not match expected value.');
+                exit('State provided in redirect does not match expected value.');
             }
 
             // Clear saved state
