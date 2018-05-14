@@ -44,7 +44,7 @@ class AuthController extends Controller
         if (isset($_GET['code'])) {
             // Check that state matches
             if (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth_state'])) {
-                exit('State provided in redirect does not match expected value.');
+            exit('State provided in redirect does not match expected value.');
             }
 
             // Clear saved state
@@ -63,13 +63,18 @@ class AuthController extends Controller
 
             try {
                 // Make the token request
-                $accessToken = $oauthClient->getAccessToken('authorization_code', [
-                'code' => $_GET['code']
-            ]);
+                $accessToken = $oauthClient->getAccessToken('authorization_code', ['code' => $_GET['code']]);
 
-            echo 'Access token: '.$accessToken->getToken();
+                // Save the access token and refresh tokens in session
+                // This is for demo purposes only. A better method would
+                // be to store the refresh token in a secured database
+                $tokenCache = new \App\TokenStore\TokenCache;
+                $tokenCache->storeTokens($accessToken->getToken(), $accessToken->getRefreshToken(), $accessToken->getExpires());
+
+                // Redirect back to mail page
+                return redirect()->route('mail');
             }
-                catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+            catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
                 exit('ERROR getting tokens: '.$e->getMessage());
             }
             exit();
