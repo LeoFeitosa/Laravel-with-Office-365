@@ -23,8 +23,6 @@ class OutlookController extends Controller
                         ->setReturnType(Model\User::class)
                         ->execute();
 
-        echo 'User: '.$user->getDisplayName().'<br/>';
-
         $messageQueryParams = array (
             // Only return Subject, ReceivedDateTime, and From fields
             "\$select" => "subject,receivedDateTime,from",
@@ -39,8 +37,9 @@ class OutlookController extends Controller
                             ->setReturnType(Model\Message::class)
                             ->execute();
 
-        foreach($messages as $msg) {
-            echo 'Message: '.$msg->getSubject().'<br/>';
-        }
+        return view('mail', array(
+            'username' => $user->getDisplayName(),
+            'messages' => $messages
+        ));
     }
 }
