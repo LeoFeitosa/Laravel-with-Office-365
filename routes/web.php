@@ -19,3 +19,4 @@ Route::get('/signin', 'AuthController@signin');
 Route::get('/authorize', 'AuthController@gettoken');
 Route::get('/mail', 'OutlookController@mail')->name('mail');
 Route::get('/calendar', 'OutlookController@calendar')->name('calendar');
+Route::get('/contacts', 'OutlookController@contacts')->name('contacts');
