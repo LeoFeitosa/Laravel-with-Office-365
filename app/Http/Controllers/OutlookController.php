@@ -23,6 +23,24 @@ class OutlookController extends Controller
                         ->setReturnType(Model\User::class)
                         ->execute();
 
-        echo 'User: '.$user->getDisplayName();
+        echo 'User: '.$user->getDisplayName().'<br/>';
+
+        $messageQueryParams = array (
+            // Only return Subject, ReceivedDateTime, and From fields
+            "\$select" => "subject,receivedDateTime,from",
+            // Sort by ReceivedDateTime, newest first
+            "\$orderby" => "receivedDateTime DESC",
+            // Return at most 10 results
+            "\$top" => "10"
+        );
+
+        $getMessagesUrl = '/me/mailfolders/inbox/messages?'.http_build_query($messageQueryParams);
+        $messages = $graph->createRequest('GET', $getMessagesUrl)
+                            ->setReturnType(Model\Message::class)
+                            ->execute();
+
+        foreach($messages as $msg) {
+            echo 'Message: '.$msg->getSubject().'<br/>';
+        }
     }
 }
