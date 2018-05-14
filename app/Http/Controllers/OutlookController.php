@@ -42,4 +42,39 @@ class OutlookController extends Controller
             'messages' => $messages
         ));
     }
+
+    public function calendar()
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $tokenCache = new \App\TokenStore\TokenCache;
+
+        $graph = new Graph();
+        $graph->setAccessToken($tokenCache->getAccessToken());
+
+        $user = $graph->createRequest('GET', '/me')
+                        ->setReturnType(Model\User::class)
+                        ->execute();
+
+        $eventsQueryParams = array (
+            // // Only return Subject, Start, and End fields
+            "\$select" => "subject,start,end",
+            // Sort by Start, oldest first
+            "\$orderby" => "Start/DateTime",
+            // Return at most 10 results
+            "\$top" => "10"
+        );
+
+        $getEventsUrl = '/me/events?'.http_build_query($eventsQueryParams);
+        $events = $graph->createRequest('GET', $getEventsUrl)
+                        ->setReturnType(Model\Event::class)
+                        ->execute();
+
+        return view('calendar', array(
+            'username' => $user->getDisplayName(),
+            'events' => $events
+        ));
+    }
 }
