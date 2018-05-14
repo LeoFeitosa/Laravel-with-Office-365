@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Microsoft\Graph\Graph;
+use Microsoft\Graph\Model;
 use Illuminate\Http\Request;
 
 class OutlookController extends Controller
@@ -14,6 +16,13 @@ class OutlookController extends Controller
 
         $tokenCache = new \App\TokenStore\TokenCache;
 
-        echo 'Token: '.$tokenCache->getAccessToken();
+        $graph = new Graph();
+        $graph->setAccessToken($tokenCache->getAccessToken());
+
+        $user = $graph->createRequest('GET', '/me')
+                        ->setReturnType(Model\User::class)
+                        ->execute();
+
+        echo 'User: '.$user->getDisplayName();
     }
 }
